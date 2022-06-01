@@ -1,8 +1,9 @@
 from keras.models import Sequential
 from keras.layers import InputLayer
+from keras.layers import Dense
 from keras import activations
-from numpy import isin
-from .Layers import *
+import numpy as np
+from .Layers import DenseLayer
 
 
 class Model:
