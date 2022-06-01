@@ -5,16 +5,17 @@ import numpy as np
 
 
 class Layer:
-    def __init__(self, layer: Dense):
+    def __init__(self, layer):
         self.layer = layer
         self.Type = type(layer)
         self.Weights = None
+        self.activation = None
         try:
             self.outputShape = layer.output_shape
         except:
             self.outputShape = None
 
-    def getLayer(self):
+    def buildLayer(self):
         return self.layer
 
     def getWeights(self):
@@ -25,7 +26,7 @@ class Layer:
 
 
 class DenseLayer(Layer):
-    def __init__(self, layer=None, Weights=None):
+    def __init__(self, layer: Dense = None, Weights: list = None):
         if not isinstance(layer, Dense):
             raise RuntimeError  # TODO add correct error
         if not isinstance(layer, type(None)):
@@ -40,6 +41,7 @@ class DenseLayer(Layer):
         if not isinstance(Weights, type(None)):
             self.Weights = Weights
 
+        self.activation = self.layer.activation
     """
     def __init__(self, Type: str, Weights: np.array):
         raise NotImplementedError
@@ -51,3 +53,7 @@ class DenseLayer(Layer):
     def setWeights(self, Weights):
         # TODO Add type Checking
         raise NotImplementedError
+    
+    def buildLayer(self): # Note: Cannot set weights before adding to model
+        units = np.shape(self.Weights[0])[1]#Get units for new layer
+        return Dense(units, activation=self.activation)
