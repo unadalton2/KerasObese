@@ -20,8 +20,6 @@ class Model:
     def AddLayer(self, index, activation=None):
         if not isinstance(index, int):
             raise RuntimeError  # TODO add correct Error
-        if not ( isinstance(activation, type(None)) or isinstance(activation, str) or isinstance(activation, activations) ):
-            raise RuntimeError # TODo add correct Error
 
         oldLayerWeights = self.Layers[index].getWeights()#Get Last layer
         newLayerActivation = self.Layers[index].activation
