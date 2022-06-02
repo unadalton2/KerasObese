@@ -37,7 +37,9 @@ class Model:
             TypeError: _description_
         """
         if not isinstance(index, int):
-            raise TypeError("Expected index to be int instead got "+type(index).__name__)  # TODO add correct Error
+            # TODO add correct Error
+            raise TypeError(
+                "Expected index to be int instead got "+type(index).__name__)
 
         oldLayerWeights = self.Layers[index].getWeights()  # Get Last layer
         oldLayerActivation = self.Layers[index].activation
@@ -45,13 +47,20 @@ class Model:
         if not isinstance(activation, type(None)):
             if isinstance(activation, str):
                 # Setting new layer activation from string to keras activation
-                newLayerActivation = getattr(activations, activation)
+                try:
+                    newLayerActivation = getattr(activations, activation)
+                except:
+                    raise ValueError(
+                        "activation must be a valid child from keras.activations instead got: "+activation)
+                    
+                    
             else:
                 newLayerActivation = activation
 
         try:
             # Get the slope and Bias for activation cancellation
-            M, B = LayerDictionary[(type(oldLayerActivation), type(newLayerActivation))]
+            M, B = LayerDictionary[(
+                oldLayerActivation.__name__, newLayerActivation.__name__)]
         except:
             print(
                 "Warning unknown combination of activation functions were found when creating layer "+str(index))
@@ -60,9 +69,8 @@ class Model:
         # Calculate new shape for identity matrix
         newShape = np.shape(oldLayerWeights[0])[1]
 
-        
         # Get weights ready
-        newLayerWeights = [np.identity(newShape)[0]*M, np.zeros(newShape)[1]*B]
+        newLayerWeights = [np.identity(newShape)*M, np.zeros(newShape)+B]
 
         # add weights to model
         self.Layers.insert(index+1, DenseLayer(Dense(newShape,
@@ -70,10 +78,63 @@ class Model:
         # newLastLayer.set_weights(lastLayerWeights)#load weights
         #raise NotImplementedError
 
-    def AddNeuron(self, index):
+    def AddNeuron(self, index: int):
+        """Adds a neuron to layer at index
+
+        Args:
+            index (int): Layer to add neuron to
+
+        Raises:
+            TypeError: Raised when index is not an int
+            ValueError: Raised when index is less then 0
+        """
         if not isinstance(index, int):
-            raise TypeError  # TODO add correct Error
-        raise NotImplementedError
+            raise TypeError(
+                "Expected index to be int instead got "+type(index).__name__)
+        if index < 0:
+            raise ValueError("index must be >= 0")
+
+        # Gets Params from layer at index
+        l1OldParams = self.Layers[index].getWeights()
+        l1OldWeights = l1OldParams[0]
+        l1OldBias = l1OldParams[1]
+
+        # Getting Params for next layer
+        if(index == len(self.Layers)):
+            l2OldParams = self.Layers[index+1].getWeights()
+            l2OldWeights = l2OldParams[0]
+
+        # Gets sizes needed for reshaping
+        prevLayerSize = np.shape(self.Layers[index].getWeights()[0])[0]
+        newSize = np.shape(l1OldWeights)[1]+1
+
+        # Padding Weights with random numbers np.zeros
+        l1NewWeights = np.random.uniform(-1, 1, (prevLayerSize, newSize))
+        l1NewWeights[:, :-1] = l1OldWeights
+
+        # Padding Layer 1 Bias with zero
+        l1NewBias = np.pad(l1OldBias, (0, 1), 'constant')
+
+        # Modify next layer (Ignore if index is currently on the last layer)
+        if index != len(self.Layers):
+            # Get next layer output size to maintain size
+            nextLayerOutputSize = np.shape(
+                self.Layers[index+1].getWeights()[0])[1]
+
+            # Padding with zeros so new neuron doesn't effect model output
+            l2NewWeights = np.zeros((newSize, nextLayerOutputSize))
+
+            l2NewWeights[:-1, :] = l2OldWeights
+
+            ##nextLayerNewWeights = np.zeros((newSize, nextLayerOutputSize))
+            l2OldParams[0] = l2NewWeights
+
+        # setting new layer weights
+        self.Layers[index].setWeights([l1NewWeights, l1NewBias])
+        if index != len(self.Layers):
+            self.Layers[index+1].setWeights(l2OldParams)
+
+        #raise NotImplementedError
 
     def build(self):
         """Generates a working keras Model, currently only supporting Sequential

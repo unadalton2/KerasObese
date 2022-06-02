@@ -52,8 +52,18 @@ class DenseLayer(Layer):
 
     def setWeights(self, Weights):
         # TODO Add type Checking
-        raise NotImplementedError
+        if not isinstance(Weights, list):
+            raise TypeError("Weights must be a list of numpy arrays instead got: "+type(Weights).__name__)
+        if len(Weights) != 2:
+            raise ValueError("Weights must be a list with length 2 instead got: "+ len(Weights))
+        for i in range(len(Weights)):
+            if not isinstance(Weights[i], np.ndarray):
+                raise TypeError("Weights must be a list of only numpy arrays found: "+type(Weights[i]).__name__+" at position: "+str(i))
+        self.Weights = Weights
+            
+            
     
     def buildLayer(self): # Note: Cannot set weights before adding to model
+        #print(np.shape(self.Weights[0]))
         units = np.shape(self.Weights[0])[1]#Get units for new layer
         return Dense(units, activation=self.activation)
