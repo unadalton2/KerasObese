@@ -9,8 +9,16 @@ from .Dict import LayerDictionary
 
 class Model:
     def __init__(self, model: Sequential) -> None:
+        """Creates a model capable of retaining pre-trained knowledge while changing network architecture. Currently only supports Sequential models.
+
+        Args:
+            model (Sequential): The model which modifications will be applied to
+
+        Raises:
+            TypeError: TypeError is raised when an invalid model is passed
+        """
         if not isinstance(model, Sequential):
-            raise RuntimeError  # TODO add correct error
+            raise TypeError  # TODO add correct error
         self.oldModel = model
         self.inputShape = model.input_shape
         self.Layers = []
@@ -18,9 +26,18 @@ class Model:
         for Layer in model.layers:
             self.Layers.append(DenseLayer(Layer))
 
-    def AddLayer(self, index, activation=None):
+    def AddLayer(self, index: int, activation=None):
+        """Adds a layer after layer at index. Maintains same size to previous layer size.
+
+        Args:
+            index (int): Specifies the layer to insert the new layer.
+            activation (_type_, optional): The activation function the new layer will use. Defaults to previous layer's activation function.
+
+        Raises:
+            TypeError: _description_
+        """
         if not isinstance(index, int):
-            raise RuntimeError("Expected index to be int instead got "+type(index).__name__)  # TODO add correct Error
+            raise TypeError("Expected index to be int instead got "+type(index).__name__)  # TODO add correct Error
 
         oldLayerWeights = self.Layers[index].getWeights()  # Get Last layer
         oldLayerActivation = self.Layers[index].activation
@@ -43,22 +60,27 @@ class Model:
         # Calculate new shape for identity matrix
         newShape = np.shape(oldLayerWeights[0])[1]
 
-        # TODO add M and C
+        
         # Get weights ready
         newLayerWeights = [np.identity(newShape)[0]*M, np.zeros(newShape)[1]*B]
 
         # add weights to model
         self.Layers.insert(index+1, DenseLayer(Dense(newShape,
                            activation=newLayerActivation), newLayerWeights))
-        # newlastLayer.set_weights(lastLayerWeights)#load weights
+        # newLastLayer.set_weights(lastLayerWeights)#load weights
         #raise NotImplementedError
 
     def AddNeuron(self, index):
         if not isinstance(index, int):
-            raise RuntimeError  # TODO add correct Error
+            raise TypeError  # TODO add correct Error
         raise NotImplementedError
 
     def build(self):
+        """Generates a working keras Model, currently only supporting Sequential
+
+        Returns:
+            _type_: Sequential
+        """
         newModel = Sequential()
         newModel.add(InputLayer(self.inputShape))
 
