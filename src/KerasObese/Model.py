@@ -100,7 +100,7 @@ class Model:
         l1OldBias = l1OldParams[1]
 
         # Getting Params for next layer
-        if(index == len(self.Layers)):
+        if(index+1 != len(self.Layers)):
             l2OldParams = self.Layers[index+1].getWeights()
             l2OldWeights = l2OldParams[0]
 
@@ -116,7 +116,7 @@ class Model:
         l1NewBias = np.pad(l1OldBias, (0, 1), 'constant')
 
         # Modify next layer (Ignore if index is currently on the last layer)
-        if index != len(self.Layers):
+        if index+1 != len(self.Layers):
             # Get next layer output size to maintain size
             nextLayerOutputSize = np.shape(
                 self.Layers[index+1].getWeights()[0])[1]
@@ -131,7 +131,7 @@ class Model:
 
         # setting new layer weights
         self.Layers[index].setWeights([l1NewWeights, l1NewBias])
-        if index != len(self.Layers):
+        if index+1 != len(self.Layers):
             self.Layers[index+1].setWeights(l2OldParams)
 
         #raise NotImplementedError
