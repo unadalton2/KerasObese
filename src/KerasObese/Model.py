@@ -3,7 +3,7 @@ from keras.layers import InputLayer
 from keras.layers import Dense
 from keras import activations
 import numpy as np
-from .Layers import DenseLayer
+from .Layers import DenseLayer, Layer
 from .Dict import LayerDictionary
 
 
@@ -23,8 +23,11 @@ class Model:
         self.inputShape = model.input_shape
         self.Layers = []
 
-        for Layer in model.layers:
-            self.Layers.append(DenseLayer(Layer))
+        for L in model.layers:
+            if isinstance(L, Dense):
+                self.Layers.append(DenseLayer(L))
+            else:
+                self.Layers.append(Layer(L))
 
     def AddLayer(self, index: int, activation=None):
         """Adds a layer after layer at index. Maintains same size to previous layer size.
