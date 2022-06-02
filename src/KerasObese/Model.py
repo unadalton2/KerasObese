@@ -4,6 +4,7 @@ from keras.layers import Dense
 from keras import activations
 import numpy as np
 from .Layers import DenseLayer
+from .Dict import LayerDictionary
 
 
 class Model:
@@ -19,26 +20,44 @@ class Model:
 
     def AddLayer(self, index, activation=None):
         if not isinstance(index, int):
-            raise RuntimeError  # TODO add correct Error
+            raise RuntimeError("Expected index to be int instead got "+type(index).__name__)  # TODO add correct Error
 
-        oldLayerWeights = self.Layers[index].getWeights()#Get Last layer
+        oldLayerWeights = self.Layers[index].getWeights()  # Get Last layer
+        oldLayerActivation = self.Layers[index].activation
         newLayerActivation = self.Layers[index].activation
         if not isinstance(activation, type(None)):
-            newLayerActivation = activation
-        newShape = np.shape(oldLayerWeights[0])[1]#Calculate new shape for identity matrix
+            if isinstance(activation, str):
+                # Setting new layer activation from string to keras activation
+                newLayerActivation = getattr(activations, activation)
+            else:
+                newLayerActivation = activation
+
+        try:
+            # Get the slope and Bias for activation cancellation
+            M, B = LayerDictionary[(type(oldLayerActivation), type(newLayerActivation))]
+        except:
+            print(
+                "Warning unknown combination of activation functions were found when creating layer "+str(index))
+            M, B = 1, 0  # Fall back if unknown combination of functions were passed  into function
+
+        # Calculate new shape for identity matrix
+        newShape = np.shape(oldLayerWeights[0])[1]
 
         # TODO add M and C
-        newLayerWeights = [np.identity(newShape), np.zeros(newShape)] #Get weights ready
+        # Get weights ready
+        newLayerWeights = [np.identity(newShape)[0]*M, np.zeros(newShape)[1]*B]
 
-        self.Layers.insert(index+1, DenseLayer(Dense(newShape, activation=newLayerActivation), newLayerWeights))#add weights to model
-        #newlastLayer.set_weights(lastLayerWeights)#load weights
+        # add weights to model
+        self.Layers.insert(index+1, DenseLayer(Dense(newShape,
+                           activation=newLayerActivation), newLayerWeights))
+        # newlastLayer.set_weights(lastLayerWeights)#load weights
         #raise NotImplementedError
 
     def AddNeuron(self, index):
         if not isinstance(index, int):
             raise RuntimeError  # TODO add correct Error
         raise NotImplementedError
-    
+
     def build(self):
         newModel = Sequential()
         newModel.add(InputLayer(self.inputShape))
