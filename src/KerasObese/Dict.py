@@ -1,6 +1,6 @@
 from keras.activations import *
 
-# dic is formated using the equation y = mx + b where the closest solution is described by (m, b)
+# dic is formatted using the equation y = mx + b where the closest solution is described by (m, b)
 LayerDictionary = {
     (relu.__name__, relu.__name__): (1, 0),  # perfect transformation
     (tanh.__name__, tanh.__name__): (1.1251, 0),
