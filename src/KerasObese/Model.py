@@ -18,7 +18,7 @@ class Model:
             TypeError: TypeError is raised when an invalid model is passed
         """
         if not isinstance(model, Sequential):
-            raise TypeError  # TODO add correct error
+            raise TypeError("model must be of type Sequential instead got: "+type(model).__name__)
         self.oldModel = model
         self.inputShape = model.input_shape
         self.Layers = []
@@ -37,12 +37,14 @@ class Model:
             activation (_type_, optional): The activation function the new layer will use. Defaults to previous layer's activation function.
 
         Raises:
-            TypeError: _description_
+            TypeError: Raised when index is not an int
+            ValueError: Raised when index is less than 0
         """
         if not isinstance(index, int):
-            # TODO add correct Error
             raise TypeError(
                 "Expected index to be int instead got "+type(index).__name__)
+        if index < 0:
+            raise ValueError("index must be an int greater than or equal to 0, instead got: "+str(index))
 
         oldLayerWeights = self.Layers[index].getWeights()  # Get Last layer
         oldLayerActivation = self.Layers[index].activation
@@ -66,7 +68,7 @@ class Model:
                 oldLayerActivation.__name__, newLayerActivation.__name__)]
         except:
             print(
-                "Warning unknown combination of activation functions were found when creating layer "+str(index))
+                "Warning unknown combination of activation functions were found when creating layer "+str(index)+"\nDefaulting to identity")
             M, B = 1, 0  # Fall back if unknown combination of functions were passed  into function
 
         # Calculate new shape for identity matrix
@@ -95,7 +97,7 @@ class Model:
             raise TypeError(
                 "Expected index to be int instead got "+type(index).__name__)
         if index < 0:
-            raise ValueError("index must be >= 0")
+            raise ValueError("index must be an int greater than or equal to 0, instead got: "+str(index))
 
         # Gets Params from layer at index
         l1OldParams = self.Layers[index].getWeights()
