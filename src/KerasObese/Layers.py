@@ -28,7 +28,7 @@ class Layer:
 class DenseLayer(Layer):
     def __init__(self, layer: Dense = None, Weights: list = None):
         if not isinstance(layer, Dense):
-            raise RuntimeError  # TODO add correct error
+            raise TypeError("layer must be a dense layer, instead got "+type(layer).__name__)
         if not isinstance(layer, type(None)):
             super().__init__(layer)
             self.Weights = layer.get_weights()
