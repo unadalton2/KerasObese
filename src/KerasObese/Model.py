@@ -8,6 +8,29 @@ from .Dict import LayerDictionary
 
 
 class Model:
+    """
+    A class use to modify existing keras models
+
+    ...
+
+    Attributes
+    ----------
+    oldModel : Sequential
+        Copy of old keras model
+    inputShape : tuple
+        Copy of Model's input shape
+    Layers : list
+        list of Layers used for rebuilding model
+
+    Methods
+    -------
+    AddDenseLayer(index, activation):
+        Adds a layer after layer at index
+    AddNeuron(index)
+        Adds a neuron to layer at index
+    build():
+        Generates a working keras Model with modifications
+    """
     def __init__(self, model: Sequential) -> None:
         """Creates a model capable of retaining pre-trained knowledge while changing network architecture. Currently only supports Sequential models.
 
@@ -29,7 +52,7 @@ class Model:
             else:
                 self.Layers.append(Layer(L))
 
-    def AddLayer(self, index: int, activation=None):
+    def AddDenseLayer(self, index: int, activation=None):
         """Adds a layer after layer at index. Maintains same size to previous layer size.
 
         Args:
@@ -141,11 +164,11 @@ class Model:
 
         #raise NotImplementedError
 
-    def build(self):
+    def build(self) -> Sequential:
         """Generates a working keras Model, currently only supporting Sequential
 
         Returns:
-            _type_: Sequential
+            Sequential: Returns a keras Sequential model with modifications 
         """
         newModel = Sequential()
         newModel.add(InputLayer(self.inputShape))
