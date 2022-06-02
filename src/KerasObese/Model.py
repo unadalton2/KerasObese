@@ -20,7 +20,8 @@ class Model:
     inputShape : tuple
         Copy of Model's input shape
     Layers : list
-        list of Layers used for rebuilding model
+        list of Layers used f
+        or rebuilding model
 
     Methods
     -------
@@ -31,6 +32,7 @@ class Model:
     build():
         Generates a working keras Model with modifications
     """
+
     def __init__(self, model: Sequential) -> None:
         """Creates a model capable of retaining pre-trained knowledge while changing network architecture. Currently only supports Sequential models.
 
@@ -41,7 +43,8 @@ class Model:
             TypeError: TypeError is raised when an invalid model is passed
         """
         if not isinstance(model, Sequential):
-            raise TypeError("model must be of type Sequential instead got: "+type(model).__name__)
+            raise TypeError(
+                "model must be of type Sequential instead got: "+type(model).__name__)
         self.oldModel = model
         self.inputShape = model.input_shape
         self.Layers = []
@@ -67,7 +70,8 @@ class Model:
             raise TypeError(
                 "Expected index to be int instead got "+type(index).__name__)
         if index < 0:
-            raise ValueError("index must be an int greater than or equal to 0, instead got: "+str(index))
+            raise ValueError(
+                "index must be an int greater than or equal to 0, instead got: "+str(index))
 
         oldLayerWeights = self.Layers[index].getWeights()  # Get Last layer
         oldLayerActivation = self.Layers[index].activation
@@ -80,8 +84,7 @@ class Model:
                 except:
                     raise ValueError(
                         "activation must be a valid child from keras.activations instead got: "+activation)
-                    
-                    
+
             else:
                 newLayerActivation = activation
 
@@ -120,7 +123,8 @@ class Model:
             raise TypeError(
                 "Expected index to be int instead got "+type(index).__name__)
         if index < 0:
-            raise ValueError("index must be an int greater than or equal to 0, instead got: "+str(index))
+            raise ValueError(
+                "index must be an int greater than or equal to 0, instead got: "+str(index))
 
         # Gets Params from layer at index
         l1OldParams = self.Layers[index].getWeights()

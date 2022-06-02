@@ -30,6 +30,7 @@ class Layer:
     getOutputShape():
         Gets the expected output shape. Note: Not always possible to get the output shape.
     """
+
     def __init__(self, layer):
         """Creates a Layer of unknown type. Note this layer is not modifiable.
 
@@ -98,6 +99,7 @@ class DenseLayer(Layer):
     getOutputShape():
         Gets the expected output shape. Note: Not always possible to get the output shape.
     """
+
     def __init__(self, layer: Dense, Weights: list = None):
         """Creates a clone of layer, optionally adds weights to layer.
 
