@@ -148,9 +148,12 @@ class Model:
         newModel = Sequential()
         newModel.add(InputLayer(self.inputShape))
 
-        for Layer in self.Layers:
-            newModel.add(Layer.buildLayer())
+        for L in self.Layers:
+            if type(L) == DenseLayer:
+                newModel.add(L.buildLayer())
 
-            newModel.layers[-1].set_weights(Layer.getWeights())
+                newModel.layers[-1].set_weights(L.getWeights())
+            else:
+                newModel.add(L.buildLayer())
 
         return newModel
